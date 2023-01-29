@@ -23,7 +23,7 @@ async fn main() {
         .nest("/user", routes::user::router(Arc::clone(&app_state)));
     let app = Router::new()
         .nest("/api", api_router)
-        .merge(SpaRouter::new("/", "public").index_file("index.html"))
+        .merge(SpaRouter::new("/", "public"))
         .layer(middleware::from_fn(utils::cors::cors))
         .with_state(Arc::clone(&app_state));
 
