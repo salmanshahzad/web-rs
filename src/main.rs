@@ -6,7 +6,7 @@ use tokio::signal;
 
 use crate::state::AppState;
 
-mod env;
+mod config;
 mod error;
 mod routes;
 mod state;
@@ -15,7 +15,7 @@ mod utils;
 #[tokio::main]
 async fn main() {
     let app_state = Arc::new(AppState::new().await);
-    let port = app_state.env().port();
+    let port = app_state.config().port();
 
     let api_router = Router::new()
         .nest("/health", routes::health::router())

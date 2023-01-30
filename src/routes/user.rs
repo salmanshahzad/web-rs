@@ -70,7 +70,7 @@ async fn create_user(
         Some(0) => {
             let hashed_password = argon2::hash_encoded(
                 payload.password.as_bytes(),
-                state.env().password_salt().as_bytes(),
+                state.config().password_salt().as_bytes(),
                 &Default::default(),
             )?;
             sqlx::query!(
@@ -134,7 +134,7 @@ async fn change_password(
 ) -> ResponseResult {
     let hashed_password = argon2::hash_encoded(
         payload.new_password.as_bytes(),
-        state.env().password_salt().as_bytes(),
+        state.config().password_salt().as_bytes(),
         &Default::default(),
     )?;
     sqlx::query!(

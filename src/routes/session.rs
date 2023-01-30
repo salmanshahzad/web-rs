@@ -47,8 +47,11 @@ async fn sign_in(
             if verify_password {
                 let mut expires = OffsetDateTime::now_utc();
                 expires += Duration::weeks(1);
-                let token =
-                    token::encode(user.id, expires.unix_timestamp(), state.env().jwt_secret())?;
+                let token = token::encode(
+                    user.id,
+                    expires.unix_timestamp(),
+                    state.config().jwt_secret(),
+                )?;
 
                 let cookie = Cookie::build("token", &token)
                     .expires(expires)

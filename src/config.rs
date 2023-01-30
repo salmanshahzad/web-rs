@@ -2,7 +2,7 @@ use std::env;
 
 use dotenv::dotenv;
 
-pub struct Environment {
+pub struct Config {
     database_url: String,
     jwt_secret: String,
     password_salt: String,
@@ -10,7 +10,7 @@ pub struct Environment {
     redis_url: String,
 }
 
-impl Environment {
+impl Config {
     pub fn database_url(&self) -> &str {
         &self.database_url
     }
@@ -32,7 +32,7 @@ impl Environment {
     }
 }
 
-pub fn load_env() -> Environment {
+pub fn load_config() -> Config {
     dotenv().expect("Could not load environment variables");
 
     let database_url = env::var("DATABASE_URL").expect("Invalid DATABASE_URL environment variable");
@@ -45,7 +45,7 @@ pub fn load_env() -> Environment {
         .expect("Invalid PORT environment variable");
     let redis_url = env::var("REDIS_URL").expect("Invalid REDIS_URL environment variable");
 
-    Environment {
+    Config {
         database_url,
         jwt_secret,
         password_salt,

@@ -19,7 +19,7 @@ pub async fn verify_cookie<B>(
     let cookie = jar.get("token");
     match cookie {
         Some(cookie) => {
-            let user_id = token::decode(cookie.value(), state.env().jwt_secret())?;
+            let user_id = token::decode(cookie.value(), state.config().jwt_secret())?;
             let user = sqlx::query!("SELECT COUNT(*) FROM \"user\" WHERE id = $1;", user_id)
                 .fetch_one(state.db())
                 .await?;
@@ -51,7 +51,7 @@ pub async fn verify_token<B>(
             let auth = auth.to_str().unwrap_or_default();
             if auth.starts_with("Bearer ") {
                 let token = auth.split(' ').nth(1).unwrap_or_default();
-                let user_id = token::decode(token, state.env().jwt_secret())?;
+                let user_id = token::decode(token, state.config().jwt_secret())?;
                 let user = sqlx::query!("SELECT COUNT(*) FROM \"user\" WHERE id = $1;", user_id)
                     .fetch_one(state.db())
                     .await?;
