@@ -9,7 +9,8 @@ edition = "2021"
 axum = "0.6.4"
 axum-extra = { version = "0.4.2", features = ["cookie", "spa"] }
 cookie = "0.17.0"
-dotenv = "0.15.0"
+dotenvy = "0.15.6"
+envy = "0.4.2"
 jsonwebtoken = "8.2.0"
 redis = { version = "0.22.3", features = ["tokio-comp"] }
 rust-argon2 = "1.0.0"

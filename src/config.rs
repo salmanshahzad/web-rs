@@ -1,7 +1,7 @@
-use std::env;
+use dotenvy::dotenv;
+use serde::Deserialize;
 
-use dotenv::dotenv;
-
+#[derive(Deserialize)]
 pub struct Config {
     database_url: String,
     jwt_secret: String,
@@ -33,23 +33,6 @@ impl Config {
 }
 
 pub fn load_config() -> Config {
-    dotenv().expect("Could not load environment variables");
-
-    let database_url = env::var("DATABASE_URL").expect("Invalid DATABASE_URL environment variable");
-    let jwt_secret = env::var("JWT_SECRET").expect("Invalid JWT_SECRET environment variable");
-    let password_salt =
-        env::var("PASSWORD_SALT").expect("Invalid PASSWORD_SALT environment variable");
-    let port = env::var("PORT")
-        .ok()
-        .and_then(|port| port.parse::<u16>().ok())
-        .expect("Invalid PORT environment variable");
-    let redis_url = env::var("REDIS_URL").expect("Invalid REDIS_URL environment variable");
-
-    Config {
-        database_url,
-        jwt_secret,
-        password_salt,
-        port,
-        redis_url,
-    }
+    dotenv().ok();
+    envy::from_env::<Config>().expect("Could not parse environment variables into config")
 }
