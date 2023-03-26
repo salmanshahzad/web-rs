@@ -2,11 +2,10 @@ use std::sync::Arc;
 
 use axum::{
     extract::State,
-    handler::Handler,
     http::StatusCode,
     middleware,
     response::IntoResponse,
-    routing::{get, put},
+    routing::{delete, get, post, put},
     Extension, Json, Router,
 };
 use serde::Deserialize;
@@ -14,30 +13,21 @@ use serde_json::json;
 
 use crate::{
     error::{make_error, ResponseResult},
-    utils::auth,
+    utils::auth::{self, User},
     AppState,
 };
 
 pub fn router(state: Arc<AppState>) -> Router<Arc<AppState>> {
-    let m = middleware::from_fn_with_state(state, auth::verify_cookie);
     Router::new()
-        .route(
-            "/",
-            get(get_user.layer(m.clone()))
-                .post(create_user)
-                .delete(delete_user.layer(m.clone())),
-        )
-        .route("/username", put(change_username.layer(m.clone())))
-        .route("/password", put(change_password.layer(m.clone())))
+        .route("/", get(get_user))
+        .route("/", delete(delete_user))
+        .route("/username", put(change_username))
+        .route("/password", put(change_password))
+        .route_layer(middleware::from_fn_with_state(state, auth::verify_cookie))
+        .route("/", post(create_user))
 }
 
-async fn get_user(
-    State(state): State<Arc<AppState>>,
-    Extension(user_id): Extension<i32>,
-) -> ResponseResult {
-    let user = sqlx::query!("SELECT username FROM \"user\" WHERE id = $1;", user_id)
-        .fetch_one(state.db())
-        .await?;
+async fn get_user(Extension(user): Extension<User>) -> ResponseResult {
     let body = json!({
         "username": user.username,
     })
@@ -93,12 +83,12 @@ pub struct ChangeUsername {
 
 async fn change_username(
     State(state): State<Arc<AppState>>,
-    Extension(user_id): Extension<i32>,
+    Extension(user): Extension<User>,
     Json(payload): Json<ChangeUsername>,
 ) -> ResponseResult {
     let username_exists = sqlx::query!(
         "SELECT COUNT(*) FROM \"user\" WHERE id != $1 AND username = $2;",
-        user_id,
+        user.id,
         payload.username
     )
     .fetch_one(state.db())
@@ -108,7 +98,7 @@ async fn change_username(
             sqlx::query!(
                 "UPDATE \"user\" SET username = $1 WHERE id = $2;",
                 payload.username,
-                user_id
+                user.id
             )
             .execute(state.db())
             .await?;
@@ -129,7 +119,7 @@ pub struct ChangePassword {
 
 async fn change_password(
     State(state): State<Arc<AppState>>,
-    Extension(user_id): Extension<i32>,
+    Extension(user): Extension<User>,
     Json(payload): Json<ChangePassword>,
 ) -> ResponseResult {
     let hashed_password = argon2::hash_encoded(
@@ -140,7 +130,7 @@ async fn change_password(
     sqlx::query!(
         "UPDATE \"user\" SET password = $1 WHERE id = $2;",
         hashed_password,
-        user_id
+        user.id
     )
     .execute(state.db())
     .await?;
@@ -149,9 +139,9 @@ async fn change_password(
 
 async fn delete_user(
     State(state): State<Arc<AppState>>,
-    Extension(user_id): Extension<i32>,
+    Extension(user): Extension<User>,
 ) -> ResponseResult {
-    sqlx::query!("DELETE FROM \"user\" WHERE id = $1;", user_id)
+    sqlx::query!("DELETE FROM \"user\" WHERE id = $1;", user.id)
         .execute(state.db())
         .await?;
     Ok(StatusCode::NO_CONTENT.into_response())

@@ -2,13 +2,13 @@
 
 - Web server written in Rust using Axum.
 - Connects to PostgreSQL and Redis.
-- Includes middleware for CORS as well as cookie and JWT authentication.
+- Includes middleware for CORS and cookie-based sessions.
 - Serves static files from the `public` directory.
 
 ## Environment Variables
 
+- `COOKIE_SECRET`
 - `DATABASE_URL`
-- `JWT_SECRET`
 - `PASSWORD_SALT`
 - `PORT`
 - `REDIS_URL`

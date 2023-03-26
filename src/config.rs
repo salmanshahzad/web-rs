@@ -3,20 +3,20 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct Config {
+    cookie_secret: String,
     database_url: String,
-    jwt_secret: String,
     password_salt: String,
     port: u16,
     redis_url: String,
 }
 
 impl Config {
-    pub fn database_url(&self) -> &str {
-        &self.database_url
+    pub fn cookie_secret(&self) -> &str {
+        &self.cookie_secret
     }
 
-    pub fn jwt_secret(&self) -> &str {
-        &self.jwt_secret
+    pub fn database_url(&self) -> &str {
+        &self.database_url
     }
 
     pub fn password_salt(&self) -> &str {

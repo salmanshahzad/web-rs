@@ -2,21 +2,17 @@ use std::sync::Arc;
 
 use axum::{
     extract::State,
-    http::{header, HeaderMap, HeaderValue, StatusCode},
+    http::StatusCode,
     response::IntoResponse,
-    routing::post,
+    routing::{delete, post},
     Json, Router,
 };
-use cookie::{
-    time::{Duration, OffsetDateTime},
-    Cookie,
-};
+use axum_sessions::extractors::WritableSession;
 use serde::Deserialize;
 
 use crate::{
     error::{make_error, ResponseResult},
     state::AppState,
-    utils::token,
 };
 
 #[derive(Deserialize)]
@@ -26,11 +22,14 @@ struct SignIn {
 }
 
 pub fn router() -> Router<Arc<AppState>> {
-    Router::new().route("/", post(sign_in).delete(sign_out))
+    Router::new()
+        .route("/", post(sign_in))
+        .route("/", delete(sign_out))
 }
 
 async fn sign_in(
     State(state): State<Arc<AppState>>,
+    mut session: WritableSession,
     Json(payload): Json<SignIn>,
 ) -> ResponseResult {
     let user = sqlx::query!(
@@ -45,24 +44,8 @@ async fn sign_in(
             let verify_password =
                 argon2::verify_encoded(&user.password, payload.password.as_bytes())?;
             if verify_password {
-                let mut expires = OffsetDateTime::now_utc();
-                expires += Duration::weeks(1);
-                let token = token::encode(
-                    user.id,
-                    expires.unix_timestamp(),
-                    state.config().jwt_secret(),
-                )?;
-
-                let cookie = Cookie::build("token", &token)
-                    .expires(expires)
-                    .http_only(true)
-                    .finish();
-
-                let headers = HeaderMap::from_iter([(
-                    header::SET_COOKIE,
-                    HeaderValue::from_str(&cookie.to_string())?,
-                )]);
-                Ok((StatusCode::OK, headers).into_response())
+                session.insert("user_id", user.id)?;
+                Ok(StatusCode::NO_CONTENT.into_response())
             } else {
                 Ok(make_error(
                     StatusCode::UNAUTHORIZED,
@@ -77,13 +60,7 @@ async fn sign_in(
     }
 }
 
-async fn sign_out() -> ResponseResult {
-    let mut cookie = Cookie::new("token", "");
-    cookie.make_removal();
-
-    let headers = HeaderMap::from_iter([(
-        header::SET_COOKIE,
-        HeaderValue::from_str(&cookie.to_string())?,
-    )]);
-    Ok((StatusCode::NO_CONTENT, headers).into_response())
+async fn sign_out(mut session: WritableSession) -> ResponseResult {
+    session.destroy();
+    Ok(StatusCode::NO_CONTENT.into_response())
 }
