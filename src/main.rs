@@ -1,10 +1,10 @@
 use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use async_redis_session::RedisSessionStore;
-use axum::{middleware, Router, Server};
-use axum_extra::routing::SpaRouter;
+use axum::{Router, Server};
 use axum_sessions::SessionLayer;
 use tokio::signal;
+use tower_http::{cors::CorsLayer, services::ServeDir};
 
 use crate::state::AppState;
 
@@ -30,9 +30,9 @@ async fn main() {
         .nest("/user", routes::user::router(Arc::clone(&app_state)));
     let app = Router::new()
         .nest("/api", api_router)
-        .merge(SpaRouter::new("/", "public"))
+        .nest_service("/", ServeDir::new("public"))
         .layer(session_layer)
-        .layer(middleware::from_fn(utils::cors::cors))
+        .layer(CorsLayer::very_permissive())
         .with_state(Arc::clone(&app_state));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port()));
