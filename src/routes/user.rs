@@ -6,14 +6,18 @@ use axum::{
     middleware,
     response::IntoResponse,
     routing::{delete, get, post, put},
-    Extension, Json, Router,
+    Extension, Router,
 };
 use serde::Deserialize;
 use serde_json::json;
+use validator::Validate;
 
 use crate::{
     error::{make_error, ResponseResult},
-    utils::auth::{self, User},
+    utils::{
+        auth::{self, User},
+        json::Json,
+    },
     AppState,
 };
 
@@ -35,9 +39,11 @@ async fn get_user(Extension(user): Extension<User>) -> ResponseResult {
     Ok(body.into_response())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 pub struct CreateUser {
+    #[validate(length(min = 8, message = "Username must be at least 8 characters"))]
     username: String,
+    #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
     password: String,
 }
 
@@ -76,8 +82,9 @@ async fn create_user(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 pub struct ChangeUsername {
+    #[validate(length(min = 8, message = "Username must be at least 8 characters"))]
     username: String,
 }
 
@@ -112,8 +119,9 @@ async fn change_username(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 pub struct ChangePassword {
+    #[validate(length(min = 8, message = "Password must be at least 8 characters"))]
     new_password: String,
 }
 

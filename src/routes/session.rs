@@ -5,19 +5,23 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
     routing::{delete, post},
-    Json, Router,
+    Router,
 };
 use axum_sessions::extractors::WritableSession;
 use serde::Deserialize;
+use validator::Validate;
 
 use crate::{
     error::{make_error, ResponseResult},
     state::AppState,
+    utils::json::Json,
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 struct SignIn {
+    #[validate(length(min = 1, message = "Username is required"))]
     username: String,
+    #[validate(length(min = 1, message = "Password is required"))]
     password: String,
 }
 
