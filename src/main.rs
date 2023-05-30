@@ -3,6 +3,7 @@ use std::{net::SocketAddr, sync::Arc, time::Duration};
 use async_redis_session::RedisSessionStore;
 use axum::{Router, Server};
 use axum_sessions::SessionLayer;
+use log::{error, info};
 use tokio::signal;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
@@ -16,8 +17,11 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     let app_state = Arc::new(AppState::new().await);
     let config = app_state.config();
+    info!("Initialized app state");
 
     let redis_session_store =
         RedisSessionStore::new(config.redis_url()).expect("Could not create Redis session store");
@@ -42,14 +46,14 @@ async fn main() {
             signal::ctrl_c().await.ok();
         });
 
-    println!("Server listening on port {}", config.port());
+    info!("Server listening on port {}", config.port());
     match server.await {
         Ok(()) => shutdown(app_state).await,
-        Err(err) => eprintln!("Server error: {err}"),
+        Err(err) => error!("Server error: {err}"),
     }
 }
 
 async fn shutdown(state: Arc<AppState>) {
-    println!("Shutting down server");
+    info!("Shutting down server");
     state.db().close().await;
 }

@@ -10,7 +10,9 @@ async-redis-session = "0.2.2"
 axum = "0.6.12"
 axum-sessions = "0.5.0"
 dotenvy = "0.15.7"
+env_logger = "0.10.0"
 envy = "0.4.2"
+log = "0.4.17"
 redis = { version = "0.22.3", features = ["tokio-comp"] }
 rust-argon2 = "1.0.0"
 serde = { version = "1.0.158", features = ["derive"] }

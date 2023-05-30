@@ -3,6 +3,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use log::error;
 use redis::RedisError;
 use serde_json::{json, Error as SerdeJsonError};
 use sqlx::Error as DbError;
@@ -24,7 +25,7 @@ pub enum AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        eprintln!("ERROR: {self:?}");
+        error!("{self:?}");
         StatusCode::INTERNAL_SERVER_ERROR.into_response()
     }
 }
