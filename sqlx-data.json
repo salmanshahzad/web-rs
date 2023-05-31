@@ -1,0 +1,159 @@
+{
+  "db": "PostgreSQL",
+  "313aede0e8116c374238e784adae6653a9baf5ef9307617ee17165a76431cab4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(*) FROM \"user\" WHERE username = $1;"
+  },
+  "406bc7db32c3b16e0e1f2728a76019ef1646f5f510442bdc0c20735fba054878": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "INSERT INTO \"user\" (username, password) VALUES ($1, $2)"
+  },
+  "60052c09546b142087edbb8c7677a63a9567bbdc0ae3a6cb1626a3fd3b520c67": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "password",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "SELECT * FROM \"user\" WHERE id = $1;"
+  },
+  "8cb6670b215102202242b6d68955a7bc913f3995df415bf4f8796eb8732e3c08": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "password",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT * FROM \"user\" WHERE username = $1;"
+  },
+  "96383d7f42b0b5259ff5996979ca1c789eab866381dc01acc0539c919134981f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int4"
+        ]
+      }
+    },
+    "query": "UPDATE \"user\" SET username = $1 WHERE id = $2;"
+  },
+  "b27e78f8804b797ac37d45e828f0070405b23e9018b59ad40534b6fe8b853527": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int4"
+        ]
+      }
+    },
+    "query": "UPDATE \"user\" SET password = $1 WHERE id = $2;"
+  },
+  "d3d4599dfae2cd1363da0d2c9b3fa89a69c5d83386704a468c8bca06982d7c87": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Text"
+        ]
+      }
+    },
+    "query": "SELECT COUNT(*) FROM \"user\" WHERE id != $1 AND username = $2;"
+  },
+  "fe1d5ad608989b17e3b5e1418ac67381858140c1e395eb29c62723256cac9072": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      }
+    },
+    "query": "DELETE FROM \"user\" WHERE id = $1;"
+  }
+}

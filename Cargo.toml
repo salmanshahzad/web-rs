@@ -17,7 +17,7 @@ redis = { version = "0.23.0", features = ["tokio-comp"] }
 rust-argon2 = "1.0.0"
 serde = { version = "1.0.163", features = ["derive"] }
 serde_json = "1.0.96"
-sqlx = { version = "0.6.3", features = ["postgres", "runtime-tokio-native-tls"] }
+sqlx = { version = "0.6.3", features = ["offline", "postgres", "runtime-tokio-native-tls"] }
 thiserror = "1.0.40"
 tokio = { version = "1.28.2", features = ["full"] }
 tower-http = { version = "0.4.0", features = ["cors", "fs"] }
