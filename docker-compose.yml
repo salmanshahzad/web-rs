@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    env_file: ".env.docker"
+    depends_on:
+      - db
+      - cache
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - "./public:/usr/src/app/public"
+  db:
+    image: postgres:15.3
+    env_file: ".env.docker"
+    volumes:
+      - "./pgdata:/var/lib/postgresql/data"
+  cache:
+    image: redis:7.0.11
