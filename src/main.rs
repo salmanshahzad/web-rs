@@ -1,9 +1,10 @@
-use std::{net::SocketAddr, sync::Arc, time::Duration};
+use std::{net::SocketAddr, path::Path, sync::Arc, time::Duration};
 
 use async_redis_session::RedisSessionStore;
 use axum::{Router, Server};
 use axum_sessions::SessionLayer;
 use log::{error, info};
+use sqlx::migrate::Migrator;
 use tokio::signal;
 use tower_http::{cors::CorsLayer, services::ServeDir};
 
@@ -22,6 +23,14 @@ async fn main() {
     let app_state = Arc::new(AppState::new().await);
     let config = app_state.config();
     info!("Initialized app state");
+
+    let migrator = Migrator::new(Path::new("./migrations"))
+        .await
+        .expect("Could not create migrator");
+    migrator
+        .run(app_state.db())
+        .await
+        .expect("Could not run migrations");
 
     let redis_session_store =
         RedisSessionStore::new(config.redis_url()).expect("Could not create Redis session store");
